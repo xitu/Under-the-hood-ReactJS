@@ -1,21 +1,21 @@
-# Under the hood: ReactJS
-<em> This repository contains an explanation of inner work of ReactJS. In fact, I was debugging through the entire code base and put all the logic on visual block-schemes, analyzed them, summarized and explained main concepts and approaches. I've already finished with Stack version and now I work with the next, Fiber version.  </em>
+# ReactJS 底层揭秘
+本库包含 ReactJS 内部工作原理的说明。实际上，我在调试整个代码库时，将所有的逻辑放在可视化的流程图上，对它们进行分析，然后总结和解释主要的概念和方法。我已经完成了 Stack 版本，现在我在研究下一个版本 —— Fiber。
 
->> Read in the best format from [github-pages website](https://bogdan-lyashenko.github.io/Under-the-hood-ReactJS/).
+> 通过 [github-pages 网站](https://bogdan-lyashenko.github.io/Under-the-hood-ReactJS/)来以最佳格式阅读.
 
-> Feel free to open an issue regarding any ideas you have to make it better.
+> 为了让它变得更好，如果你有任何想法，欢迎随时提 issue。
 
-Each scheme is clickable and can be opened in a new tab, use that to zoom it and be able to read from it. Keep the article and a scheme you are reading about at that moment in separate windows (tabs), that will help to match text and code flow easier.
+每张流程图都可以通过点击在新的选项卡中打开，然后通过缩放使它适合阅读。在单独的窗口（选项卡）中保留文章和正在阅读的流程图，将有助于更容易地匹配文本和代码流。
 
-We are gonna talk here about both ReactJS versions, current one with Stack reconciler and the next one with Fiber (as you probably know, the next version of ReactJS will be released soon), so, you can understand better how current React works and appreciate huge achievements on React-Fiber.  We use [React v15.4.2](https://github.com/facebook/react/tree/v15.4.2) for explaining how ‘legacy React’ works and React v16.*.*** for ‘Fiber’. Let’s start from old (I have fun to say that) stack version.
+我们将在这里谈论 ReactJS 的两个版本，老版本使用的是 Stack 协调引擎，新版本使用的是 Fiber（你可能已经知道，React v16 已经正式发布了）。让我们先深入地了解（目前广泛使用的）React-Stack 的工作原理，并期待下 React-Fiber 带来的重大变革。我们使用 [React v15.4.2](https://github.com/facebook/react/tree/v15.4.2) 来解释“旧版 React”的工作原理。
 
 
-## Stack reconciler
+## Stack
 [![](./stack/images/intro/all-page-stack-reconciler-25-scale.jpg)](./stack/images/intro/all-page-stack-reconciler.svg)
 
-The entire scheme is divided into 15 parts, let's get started.
+整个流程图分为 15 个部分，让我们开始吧。
 
-* [Intro](./stack/book/Intro.md)
+* [介绍](./stack/book/Intro.md)
 * [Part 0](./stack/book/Part-0.md)
 * [Part 1](./stack/book/Part-1.md)
 * [Part 2](./stack/book/Part-2.md)
@@ -35,4 +35,4 @@ The entire scheme is divided into 15 parts, let's get started.
 
 
 ## Fiber
-1. [Intro](./fiber/book/Intro.md) [TODO]
+1. [介绍](./fiber/book/Intro.md) [TODO]
