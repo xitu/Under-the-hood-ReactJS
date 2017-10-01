@@ -6,11 +6,11 @@
 
 ### 挂载
 
- `componentMount` 方法是我们整个系列中极其重要的一个部分。如图，我们关注 `ReactCompositeComponent.mountComponent` (1) 方法
+`componentMount` 方法是我们整个系列中极其重要的一个部分。如图，我们关注 `ReactCompositeComponent.mountComponent` (1) 方法。
 
 如果你还记得，我曾提到过 **组件树的入口组件** 是 `TopLevelWrapper` 组件 (React 底层内部类)。我们准备挂载它。由于它实际上是一个空的包装器，调试起来非常枯燥并且对实际的流程而言没有任何影响，所以我们跳过这个组件从他的孩子组件开始分析。
 
-把组件挂载到组件树上的过程就是先挂载父亲组件，然后他的孩子组件，然后他的孩子的孩子组件，依次类推。可以肯定，当 `TopLevelWrapper` 挂载后，他的孩子组件 (用来管理 `ExampleApplication` 的组件 `ReactCompositeComponent`) 也会在同一阶段注入.
+把组件挂载到组件树上的过程就是先挂载父亲组件，然后他的孩子组件，然后他的孩子的孩子组件，依次类推。可以肯定，当 `TopLevelWrapper` 挂载后，他的孩子组件 (用来管理 `ExampleApplication` 的组件 `ReactCompositeComponent`) 也会在同一阶段注入。
 
 现在我们回到步骤 (1) 观察这个方法的内部实现，有一些重要行为会发生，接下来让我们深入研究这些重要行为。
 
@@ -66,7 +66,7 @@ if (inst.componentWillMount) {
 
 确实如此，但是当 state 被重新计算完成后，会调用我们在组件中申明的 render 方法。再一次接触 “我们的” 代码。
 
-接下来下一步就会创建 React 的组件实例。然后呢？我们已经看见过步骤 (5) `this._instantiateReactComponent` 的调用了，对吗？是的。在那个时候它为我们的 `ExampleApplication` 组件实例化了 `ReactCompositeComponent`，现在我们准备基于它的 `render` 方法获得的元素作为它的孩子创建 VDOM (虚拟 DOM) 实例，当该实例被创建后，我们会再次调用 `ReactReconciler.mountComponent`，但是这次我们传入刚刚新创建的  `ReactDOMComponent` 实例 作为`internalInstance`。
+接下来下一步就会创建 React 的组件实例。然后呢？我们已经看见过步骤 (5) `this._instantiateReactComponent` 的调用了，对吗？是的。在那个时候它为我们的 `ExampleApplication` 组件实例化了 `ReactCompositeComponent`，现在我们准备基于它的 `render` 方法获得的元素作为它的孩子创建 VDOM (虚拟 DOM) 实例，当该实例被创建后，我们会再次调用 `ReactReconciler.mountComponent`，但是这次我们传入刚刚新创建的 `ReactDOMComponent` 实例作为`internalInstance`。
 
 然后继续调用此类中的 `mountComponent` 方法，这样递归往下...
 
