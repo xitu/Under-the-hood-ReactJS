@@ -1,54 +1,54 @@
-## Part 3
+## 第 3 部分
 
 [![](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/3/part-3.svg)](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/3/part-3.svg)
 
-<em>3.0 Part 3 (clickable)</em>
+<em>3.0 第 3 部分 (点击查看大图)</em>
 
-### Mount
+### 挂载
 
-The method `componentMount` is one of the biggest parts of our journey! So, the method that is interesting for us is `ReactCompositeComponent.mountComponent`(1).
+ `componentMount` 方法是我们整个系列中极其重要的一个部分。如图，我们关注 `ReactCompositeComponent.mountComponent` (1) 方法
 
-If you remember, I mentioned that the **first component that is pushed into a component's tree** is `TopLevelWrapper` (internal React class). Here, we are going to mount it. But... it’s basically an empty wrapper, so, it’s kind of boring to debug. It doesn’t affect flow at all, so, I suggest we skip it right now and move on to its child.
+如果你还记得，我曾提到过 **组件树的入口组件** 是 `TopLevelWrapper` 组件 (React 底层内部类)。我们准备挂载它。由于它实际上是一个空的包装器，调试起来非常枯燥并且对实际的流程而言没有任何影响，所以我们跳过这个组件从他的孩子组件开始分析。
 
-That’s how mounting of a tree actually works, you mount the parent, then its child, and a child of a child, and so on. Just believe me, after `TopLevelWrapper` is mounted, the child of it (`ReactCompositeComponent`, which manages the `ExampleApplication` component) will be put into the same phase.
+把组件挂载到组件树上的过程就是先挂载父亲组件，然后他的孩子组件，然后他的孩子的孩子组件，依次类推。可以肯定，当 `TopLevelWrapper` 挂载后，他的孩子组件 (用来管理 `ExampleApplication` 的组件 `ReactCompositeComponent`) 也会在同一阶段注入.
 
-Alright, we are back to step (1). Let’s see what's inside. There are some key actions that are going to happen, so let’s discuss this logic with details.
+现在我们回到步骤 (1) 观察这个方法的内部实现，有一些重要行为会发生，接下来让我们深入研究这些重要行为。
 
-### Assigning instance updater
+### 构造 instance 和 updater
 
-That `updater` (2), returned from `transaction.getUpdateQueue()`, is actually the `ReactUpdateQueue` module. So, why is it actually **assigned here**? Well, because `ReactCompositeComponent` (the class we are currently looking at) is one used in all platforms, but updaters are different, so we assign it dynamically during mounting depending on the platform.
+从 `transaction.getUpdateQueue()` 结果返回的步骤 (2) 方法 `updater` 实际上就是 `ReactUpdateQueue` 模块。 那么为什么需要在这里构造它呢？因为我们正在研究的类 `ReactCompositeComponent` 是一个全平台的共用的类，但是 `updater` 却依赖于平台环境而不尽相同，所以我们在这里根据不同的平台动态的构造它。
 
-Alright. We don’t really need this `updater` for now, but keep it in mind. `updater` is really **important**, it will be used soon by well-known component method **`setState`**.
+然而，我们现在并不马上需要这个 `updater`，但是你要记住它是非常重要的，因为它很快就会应用于非常知名的组件内更新方法 **`setState`**。
 
-Actually, not only is `updater` assigned to an instance during this phase, the component instance (your custom component) is also extended with `props`, `context`, and `refs`.
+事实上在这个过程中，不仅仅 `updater` 被构造，组件实例（你的自定义组件）也获得了继承的 `props`, `context`, 和 `refs`。
 
-Check out the code below:
+观察以下的代码:
 
 ```javascript
 // \src\renderers\shared\stack\reconciler\ReactCompositeComponent.js#255
-// These should be set up in the constructor, but as a convenience for
-// simpler class abstractions, we set them up after the fact.
+// 这些应该在构造方法里赋值，但是为了
+// 使类的抽象更简单，我们在它之后赋值。
 inst.props = publicProps;
 inst.context = publicContext;
 inst.refs = emptyObject;
 inst.updater = updateQueue;
 ```
 
-So, then you can access `props` in your code from an instance, like `this.props`.
+因此，你才可以通过一个实例从你的代码中获得 `props`，比如 `this.props`。
 
-### Create ExampleApplication instance
+### 创建 ExampleApplication 实例
 
-By calling `_constructComponent` (3) and through several construction methods, finally `new ExampleApplication()` will be created. That’s the point when the constructor from our code will be called. So, it's the first time our code was actually touched by React’s ecosystem. Nice.
+通过调用步骤 (3) 的方法  `_constructComponent` 然后经过几个构造方法的作用后，最终创建了 `new ExampleApplication()`。这就是我们代码中构造方法第一次被执行的时机，当然也是我们的代码第一次实际接触到 React 的生态系统，很棒。
 
-### Perform initial mount
+### 执行首次挂载
 
-So, we go through mount (4) and the first thing that should happen here is a call of `componentWillMount` (if it was specified of course). It’s the first method of life-cycle hooks we meet. Also, a bit below you can see `componentDidMount`, but it’s actually just pushed into the transaction queue because it shouldn’t be called directly. It happens only at the very end, when mounting operations are done. Also, you could possibly add `setState` calls inside `componentWillMount`. In that case, the state will of course be re-computed, but without calling the `render` method (it just doesn't make sense to, because the component is not mounted yet).
+接着我们研究步骤 (4)，第一个即将发生的行为是 `componentWillMount`(当然仅当它被定义时) 的调用。这是我们遇到的第一个生命周期钩子函数。当然，在下面一点你会看到 `componentDidMount` 函数, 只不过这时由于它不能马上执行，而是被注入了一个事务队列中，在很后面执行。他会在挂载系列操作执行完毕后执行。当然你也可能在 `componentWillMount` 内部调用 `setState`，在这种情况下 `state` 会被重新计算但此时不会调用 `render`。(这是合理的，因为这时候组件还没有被挂载)
 
-Official documentation proves the same:
+官方文档的解释也证明这一点:
 
-> `componentWillMount()` is invoked immediately before mounting occurs. It is called before `render()`, therefore setting state in this method will not trigger a re-rendering.
+> `componentWillMount()` 在挂载执行之前执行，他会在 `render()` 之前被调用，因此在这个过程中设置组件状态不会触发重绘。
 
-Let’s check the code, just to make sure ;)
+观察以下的代码，进一步验证：
 
 ```javascript
 // \src\renderers\shared\stack\reconciler\ReactCompositeComponent.js#476
@@ -56,46 +56,46 @@ if (inst.componentWillMount) {
     //..
     inst.componentWillMount();
 
-    // When mounting, calls to `setState` by `componentWillMount` will set
-    // `this._pendingStateQueue` without triggering a re-render.
+    // 当挂载时, 在 `componentWillMount` 中调用的 `setState` 会执行并改变状态
+    // `this._pendingStateQueue` 不会触发重渲染
     if (this._pendingStateQueue) {
         inst.state = this._processPendingState(inst.props, inst.context);
     }
 }
 ```
 
-True. Well, but when `state` is recalculated, we call the `render` method. Yes, exactly the one which we specify in our components! So, one more touch of ‘our’ code.
+确实如此，但是当 state 被重新计算完成后，会调用我们在组件中申明的 render 方法。再一次接触 “我们的” 代码。
 
-Alright, the next thing is to create a React component instance. Erm... what, again? Seems we’ve already seen this `this._instantiateReactComponent`(5) call, right? That’s true, but that time we instantiated a `ReactCompositeComponent` for our `ExampleApplication` component. Now, we are going to create VDOM instances for its child based on the element we got from the `render` method. For our exact case, the render method returns `div`, so the VDOM representation for it is `ReactDOMComponent`. When the instance is created, we call `ReactReconciler.mountComponent` again, but this time as `internalInstance`, we pass a newly created instance of `ReactDOMComponent`.
+接下来下一步就会创建 React 的组件实例。然后呢？我们已经看见过步骤 (5) `this._instantiateReactComponent` 的调用了，对吗？是的。在那个时候它为我们的 `ExampleApplication` 组件实例化了 `ReactCompositeComponent`，现在我们准备基于它的 `render` 方法获得的元素作为它的孩子创建 VDOM (虚拟 DOM) 实例，当该实例被创建后，我们会再次调用 `ReactReconciler.mountComponent`，但是这次我们传入刚刚新创建的  `ReactDOMComponent` 实例 作为`internalInstance`。
 
-And, call `mountComponent` on it…
+然后继续调用此类中的 `mountComponent` 方法，这样递归往下...
 
-### Alright, we’ve finished *Part 3*.
+### 好，**第 3 部分**我们讲完了
 
-Let’s recap how we got here. Let's look at the scheme one more time, then remove redundant less important pieces, and it becomes this:
+我们来回顾一下我们学到的。我们再看一下这种模式，然后去掉冗余的部分：
 
 [![](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/3/part-3-A.svg)](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/3/part-3-A.svg)
 
-<em>3.1 Part 3 simplified (clickable)</em>
+<em>3.1 第 3 部分简化版 (点击查看大图)</em>
 
-And we should probably fix spaces and alignment as well:
+让我们适度在调整一下:
 
 [![](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/3/part-3-B.svg)](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/3/part-3-B.svg)
 
-<em>3.2 Part 3 simplified & refactored (clickable)</em>
+<em>3.2 第 3 部分简化和重构 (点击查看大图)</em>
 
-Nice. In fact, that’s all that happens here. So, we can take the essential value from *Part 3* and use it for the final `mounting` scheme:
+很好，实际上，下面的示意图就是我们所讲的。因此，我们可以理解**第 3 部分**的本质，并将其用于最终的 `mount` 方案：:
 
 [![](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/3/part-3-C.svg)](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/3/part-3-C.svg)
 
-<em>3.3 Part 3 essential value (clickable)</em>
+<em>3.3 第 3 部分本质 (点击查看大图)</em>
 
-And then we're done!
-
-
-[To the next page: Part 4 >>](./Part-4.md)
-
-[<< To the previous page: Part 2](./Part-2.md)
+完成!
 
 
-[Home](../../README.md)
+[下一节: 第 4 部分 >>](./Part-4.md)
+
+[<< 上一节: 第 2 部分](./Part-2.md)
+
+
+[主页](../../README.md)
