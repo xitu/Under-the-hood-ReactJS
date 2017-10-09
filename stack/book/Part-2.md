@@ -42,8 +42,6 @@ var TRANSACTION_WRAPPERS = [
 
 <em>2.2 第二部分 简化与重构</em>
 
-Nice. In fact, that’s all that happens here. So, we can take the essential value from *Part 1* and use it for the final `mounting` scheme:
-
 很好，其实这就是这一部分所发生的一切。因此，我们可以从 *第一部分* 中获取到必要的信息，然后完善 `mounting` 的流程图：
 
 [![](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/2/part-2-C.svg)](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/2/part-2-C.svg)
