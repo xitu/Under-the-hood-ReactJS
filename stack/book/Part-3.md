@@ -14,13 +14,13 @@
 
 现在我们回到步骤 (1) 观察这个方法的内部实现，有一些重要行为会发生，接下来让我们深入研究这些重要行为。
 
-### 构造 instance 和 updater
+### 给实例赋值 updater
 
-从 `transaction.getUpdateQueue()` 结果返回的步骤 (2) 方法 `updater` 实际上就是 `ReactUpdateQueue` 模块。 那么为什么需要在这里构造它呢？因为我们正在研究的类 `ReactCompositeComponent` 是一个全平台的共用的类，但是 `updater` 却依赖于平台环境而不尽相同，所以我们在这里根据不同的平台动态的构造它。
+从 `transaction.getUpdateQueue()` 方法返回的 `updater` 见图中(2)， 实际上就是 `ReactUpdateQueue` 模块。 为什么要在这里赋值一个 `updater` 呢？因为我们正在研究的类 `ReactCompositeComponent` 是一个全平台的共用的类，但是 `updater` 却依赖于平台环境有不同的实现，所以我们在这里根据不同的平台动态的将它赋值给实例。
 
 然而，我们现在并不马上需要这个 `updater`，但是你要记住它是非常重要的，因为它很快就会应用于非常知名的组件内更新方法 **`setState`**。
 
-事实上在这个过程中，不仅仅 `updater` 被构造，组件实例（你的自定义组件）也获得了继承的 `props`, `context`, 和 `refs`。
+事实上在这个过程中，不仅仅 `updater` 被赋值给实例，组件实例（你的自定义组件）也获得了继承的 `props`, `context`, 和 `refs`。
 
 观察以下的代码:
 
@@ -66,7 +66,7 @@ if (inst.componentWillMount) {
 
 确实如此，但是当 state 被重新计算完成后，会调用我们在组件中申明的 render 方法。再一次接触 “我们的” 代码。
 
-接下来下一步就会创建 React 的组件实例。然后呢？我们已经看见过步骤 (5) `this._instantiateReactComponent` 的调用了，对吗？是的。在那个时候它为我们的 `ExampleApplication` 组件实例化了 `ReactCompositeComponent`，现在我们准备基于它的 `render` 方法获得的元素作为它的孩子创建 VDOM (虚拟 DOM) 实例，当该实例被创建后，我们会再次调用 `ReactReconciler.mountComponent`，但是这次我们传入刚刚新创建的 `ReactDOMComponent` 实例作为`internalInstance`。
+接下来下一步就会创建一个 React 的组件的实例。然后呢？我们已经看见过步骤 (5) `this._instantiateReactComponent` 的调用了，对吗？是的。在那个时候它为我们的 `ExampleApplication` 组件实例化了 `ReactCompositeComponent`，现在我们准备基于它的 `render` 方法获得的元素作为它的孩子创建 VDOM (虚拟 DOM) 实例。在我们的例子中，`render` 方法返回了一个`div`，所以准确的 VDOM 元素是一个`ReactDOMElement`。当该实例被创建后，我们会再次调用 `ReactReconciler.mountComponent`，但是这次我们传入刚刚新创建的 `ReactDOMComponent` 实例作为`internalInstance`。
 
 然后继续调用此类中的 `mountComponent` 方法，这样递归往下...
 
