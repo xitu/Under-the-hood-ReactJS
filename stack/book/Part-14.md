@@ -12,7 +12,7 @@
 
 很好，现在让我们来看它的工作原理。
 
-首先，在首次迭代时，我们分析 `ExampleApplication children`。很明显可以看出子组件的类型不是 “纯内容类型”，因此情况为 ”复杂“ 情况。然后我们一层层往下递归，每层都会判断 children 的类型。顺便说一下，步骤 (2) 的 `shouldUpdateReactComponent` 判断条件可能让你有些困惑，它看上去是在验证更新与否，但实际上它会检查类型是更新还是删除与创建（为了简化流程我们跳过此条件为否的情形，假定是更新）。当然接下来我们对比新旧子组件，如果有孩子被移除，我们也会去除挂载组件，并把它移除。
+首先，在首次迭代时，我们分析 `ExampleApplication children`。很明显可以看出子组件的类型不是 “纯内容类型”，因此情况为 “复杂” 情况。然后我们一层层往下递归，每层都会判断 children 的类型。顺便说一下，步骤 (2) 的 `shouldUpdateReactComponent` 判断条件可能让你有些困惑，它看上去是在验证更新与否，但实际上它会检查类型是更新还是删除与创建（为了简化流程我们跳过此条件为否的情形，假定是更新）。当然接下来我们对比新旧子组件，如果有孩子被移除，我们也会去除挂载组件，并把它移除。
 
 [![](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/14/children-update.svg)](https://rawgit.com/Bogdan-Lyashenko/Under-the-hood-ReactJS/master/stack/images/14/children-update.svg)
 
