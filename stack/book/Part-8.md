@@ -18,7 +18,7 @@ this.updater.enqueueSetState(this, partialState)
 
 很好，我们现在深入研究步骤 (1) 的 `enqueueSetState`。首先，它会往步骤 (2) 的 `_pendingStateQueue` (来自于内部实例。注意，这里我们说的外部实例是指用户的组件 `ExampleApplication`，而内部实例则挂载过程中创建的 `ReactCompositeComponent`) 注入 `partialState` (这里的 `partialState` 就是指给 `this.setState` 传递的对象)。然后，执行 `enqueueUpdate`，这个过程会检查更新是否已经在进展中，如果是则把我们的组件注入到 `dirtyComponents` 列表中，如果不是则先初始化打开更新事务，然后把组件注入到 `dirtyComponents` 列表。
 
-总结一下，每个组件都有自己的等待状态的 `state` 列表，当你在一次事务中调用 `setState` 方法，其实只是把那个对象注入一个队列里，它会在之后一个一个依次被合并到组件 `state` 中。调用此方法同时，你的组件也会被添加进 `dirtyComponents` 列表。也许你很好奇 `dirtyComponents` 是如何工作的，这就是另一个研究重点。
+总结一下，每个组件都有自己的一组处于等待的”状态“的列表，当你在一次事务中调用 `setState` 方法，其实只是把那个状态对象注入一个队列里，它会在之后一个一个依次被合并到组件 `state` 中。调用此`setState`方法同时，你的组件也会被添加进 `dirtyComponents` 列表。也许你很好奇 `dirtyComponents` 是如何工作的，这就是另一个研究重点。
 
 ### 好, 第 8 部分我们讲完了
 
