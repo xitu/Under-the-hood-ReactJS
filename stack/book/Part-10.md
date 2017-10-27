@@ -6,14 +6,13 @@
 
 ### 脏组件
 
-就像流程图所示那样，React 会遍历步骤 (1) 的 `dirtyComponents`，并且通过事务调用步骤 (2) 的 `ReactUpdates.runBatchedUpdates`。事务? 这是一个新的，它怎么工作呢，我们一起来看。
+就像流程图所示那样，React 会遍历步骤 (1) 的 `dirtyComponents`，并且通过事务调用步骤 (2) 的 `ReactUpdates.runBatchedUpdates`。事务? 又是一个新的事务，它怎么工作呢，我们一起来看。
 
-这个事务的类型是 `ReactUpdatesFlushTransaction`，之前我们也说过，我们需要通过 `wrappers` 来理解事务具体干什么。以下是从代码注释中获得的启示：
-> ‘ReactUpdatesFlushTransaction's wrappers will clear the dirtyComponents array and perform any updates enqueued by mount-ready handlers (i.e., componentDidUpdate)’
->
+这个事务的类型是 `ReactUpdatesFlushTransaction`，之前我们也说过，我们需要通过事务包装器来理解事务具体干什么。以下是从代码注释中获得的启示：
+
 > ReactUpdatesFlushTransaction 的封装器组会清空 dirtyComponents 数组，并且执行 mount-ready 处理器组压入队列的更新 (mount-ready 处理器是指那些在 mount 成功后触发的生命周期函数。例如 `componentDidUpdate`) 
 
-但是，不管怎样，我们需要证实它。现在有两个 `wrappers`： `NESTED_UPDATES` 和 `UPDATE_QUEUEING`。在初始化的过程中，我们存下步骤 (3) 的 `dirtyComponentsLength`。然后观察下面的 `closeAll` 处，React 在更新过程中会不断检查对比 `dirtyComponentsLength`，当一批脏组件变更了，我们把它们从中数组中移出并再次执行 `flushBatchedUpdates`。 你看, 这里并没有什么黑魔法，每一步都清晰简单。
+但是，不管怎样，我们需要证实它。现在有两个 `wrappers`： `NESTED_UPDATES` 和 `UPDATE_QUEUEING`。在初始化的过程中，我们存下步骤 (3) 的 `dirtyComponentsLength`。然后观察下面的 `close` 处，React 在更新过程中会不断检查对比 `dirtyComponentsLength`，当一批脏组件变更了，我们把它们从中数组中移出并再次执行 `flushBatchedUpdates`。 你看, 这里并没有什么黑魔法，每一步都清晰简单。
 
 然而... 一个神奇的时刻出现了。`ReactUpdatesFlushTransaction` 复写了 `Transaction.perform` 方法。因为它实际上是从 `ReactReconcileTransaction` (在挂载的过程中应用到的事务，用来保障应用 `state` 的安全) 中获得的行为。因此在 `ReactUpdatesFlushTransaction.perform` 方法里，`ReactReconcileTransaction` 也被使用到，这个事务方法实际上又被封装了一次。
 
@@ -33,12 +32,10 @@ method -> ReactUpdates.runBatchedUpdates
 
 我们要做的第一件事就是给 `dirtyComponets` 排序，我们来看步骤 (4)。怎么排序呢？通过 `mount order` (当实例挂载时组件获得的序列整数)，这将意味着父组件 (先挂载) 会被先更新，然后是子组件，然后往下以此类推。
 
-下一步我们提升批号 `updateBatchNumber`，批号是一个类似当前协调状态的 ID。
+下一步我们提升批号 `updateBatchNumber`，批号是一个类似当前差分对比更新状态的 ID。
 代码注释中提到：
 
-> ‘Any updates enqueued while reconciling must be performed after this entire batch. Otherwise, if dirtyComponents is [A, B] where A has children B and C, B could update twice in a single batch if C's render enqueues an update to B (since B would have already updated, we should skip it, and the only way we can know to do so is by checking the batch counter).’
->
-> ‘任何在协调过程中压入队列的更新必须在整个批处理结束后执行。 否则, 如果 dirtyComponents 为[A, B]。 其中 A 有孩子 B 和 C, 那么如果 C 的渲染压入一个更新给 B，则 B 可能在一个批次中更新两次 (由于 B 已经更新了，我们应该跳过它，而唯一能感知的方法就是检查批号)。’
+> ‘任何在差分对比更新过程中压入队列的更新必须在整个批处理结束后执行。 否则, 如果 dirtyComponents 为[A, B]。 其中 A 有孩子 B 和 C, 那么如果 C 的渲染压入一个更新给 B，则 B 可能在一个批次中更新两次 (由于 B 已经更新了，我们应该跳过它，而唯一能感知的方法就是检查批号)。’
 
 这将避免重复更新同一个组件。
 
