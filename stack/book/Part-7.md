@@ -10,7 +10,7 @@
 
 最后一件事是 `parentNode.insertBefore(tree.node)`，其中 `parentNode` 是容器 `div` 节点，而 `tree.node` 实际上是 `ExampleAppliication` 的 div 节点。很好，加载创建的 HTML 元素终于被插入到文档中了。
 
-那么，这就是所有？并未如此。也许你还记得，`mount` 的调用被包装到一个事务中。这意味着我们需要关闭这个事务。让我们来看看我们的 `close` 包装。多数情况下，我们应该恢复一些锁定的行为，例如 `ReactInputSelection.restoreSelection()`，`ReactBrowserEventEmitter.setEnabled(previouslyEnabled)`，而且我们也需要使用 `this.reactMountReady.notifyAll` 来通知我们之前在 `transaction.reactMountReady` 中添加的所有回调。其中之一就是我们最喜欢的 `componentDidMount`，它将在 `close` 中被触发。
+那么，这就是所有？并未如此。也许你还记得，`mount` 的调用被包装到一个事务中。这意味着我们需要关闭这个事务。让我们来看看我们的 `close` 包装。多数情况下，我们应该恢复一些被锁定的行为，例如 `ReactInputSelection.restoreSelection()`，`ReactBrowserEventEmitter.setEnabled(previouslyEnabled)`，而且我们也需要使用 `this.reactMountReady.notifyAll` 来通知我们之前在 `transaction.reactMountReady` 中添加的所有回调函数。其中之一就是我们最喜欢的 `componentDidMount`，它将在 `close` 中被触发。
 
 现在你对“组件已加载”的意思有了清晰的了解。恭喜！
 
