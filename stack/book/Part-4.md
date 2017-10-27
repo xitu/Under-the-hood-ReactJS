@@ -10,7 +10,7 @@
 
 如果步骤 (1) 的 `_tag` 包含一个复杂的标签，比如 `video`、`form`、 `textarea` 等等，这些就需要更进一步的封装，对每个媒体事件需要绑上更多事件监听器，比如给 `audio` 标签增加 `volumechange` 事件监听，或者像 `select`、`textarea` 等标签只需要封装一些浏览器原生行为。
 
-我们有很多封装器干这事，比如 `ReactDOMSelect` 和 `ReactDOMTextarea` 位于源码 (src\renderers\dom\client\wrappers\folder) 中。本文就只讲解简单的 `div` 标签。
+我们有很多封装器干这事，比如 `ReactDOMSelect` 和 `ReactDOMTextarea` 位于源码 (src\renderers\dom\client\wrappers\folder) 中。本文例子中只有简单的 `div` 标签。
 
 ### Props 验证
 
