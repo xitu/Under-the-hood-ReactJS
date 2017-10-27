@@ -6,7 +6,7 @@
 
 ### 接收组件（更精确的下一个元素）
 
-通过 `ReactReconciler.receiveComponent`，React 实际上从 `ReactDOMComponent` 调用 `receiveComponent` 并传递给下一个元素。在 DOM 组件实例上重新分配并调用 update 方法。`updateComponent` 方法实际上主要是两步： 基于 `prev` 和 `next` 的属性，更新 DOM 属性和 DOM 元素的子节点。我们太棒了，我们已经分析了 `_updateDOMProperties`(`src\renderers\dom\shared\ReactDOMComponent.js#946`) 方法。就像你记得的那样，这个方法大部分处理了 HTML 元素的属性和特质，计算样式以及处理事件监听等。剩下的就是 `_updateDOMChildren`(`src\renderers\dom\shared\ReactDOMComponent.js#1076`) 方法了。
+通过 `ReactReconciler.receiveComponent`，React 实际上从 `ReactDOMComponent` 调用 `receiveComponent` 并传递给下一个元素。在 DOM 组件实例上重新分配并调用 update 方法。`updateComponent` 方法实际上主要是两步： 基于 `prev` 和 `next` 的属性，更新 DOM 属性和 DOM 元素的子节点。好在我们已经分析了 `_updateDOMProperties`(`src\renderers\dom\shared\ReactDOMComponent.js#946`) 方法。就像你记得的那样，这个方法大部分处理了 HTML 元素的属性和特质，计算样式以及处理事件监听等。剩下的就是 `_updateDOMChildren`(`src\renderers\dom\shared\ReactDOMComponent.js#1076`) 方法了。
 
 ### 好了，我们已经完成了*第 13 部分*。好短的一章。
 让我们概括一下我们怎么到这里的。再看一下这张图，然后移除掉冗余的不那么重要的部分，它就变成了这样：
