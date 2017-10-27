@@ -8,15 +8,13 @@
 
 现在我们已经到更新行为的开始点，此时应该先调用步骤 (1) 的 `componentWillUpdate` (当然必须声明过) 的生命周期钩子。然后重绘组件并且把另一个知名的方法 `componentDidUpdate` 的调用压入队列 (推迟是因为它应该在更新操作结束后执行)。那怎么重绘呢？实际上这时候会调用组件的 render 方法，并且相应的更新 DOM。所以第一步，调用实例 (`ExampleApplication`) 中步骤 (2) 的 `render` 方法, 并且存储更新的结果 (这里会返回 React 元素)。然后我们会和之前已经渲染的元素对比并决策出哪些 DOM 应该被更新。
 
-这个部分是 React 最具有魅力的功能，它避免冗余的 DOM 更新，只更新我们需要的部分以提高性能。
+这个部分是 React 杀手级别的功能，它避免冗余的 DOM 更新，只更新我们需要的部分以提高性能。
 
 我们来看源码对步骤 (3) 的 `shouldUpdateReactComponent` 方法的注释：
 
-> ‘determines if the existing instance should be updated as opposed to being destroyed or replaced by a new instance’.
->
 > 决定现有实例的更新是部分更新，还是被移除还是被一个新的实例替换
 
-因此，通俗点讲，这个方法会检测这个元素是否应该被彻底的替换, 在彻底替换掉情况下，旧的部分需要先被 `unmounted`，然后从 `render` 获取的新的部分应该被挂载，然后把挂载后获得的元素替换现有的。这个方法还会检测是否一个元素可以被部分更新。彻底替换元素的主要条件是当一个新的元素是空元素 (原来的被 render 逻辑移除了)。或者它的标签不同，比如原先是一个 `div`，然而是现在是其它的。让我们来看以下代码，表达的非常清晰。
+因此，通俗点讲，这个方法会检测这个元素是否应该被彻底的替换, 在彻底替换掉情况下，旧的部分需要先被 `unmounted`(卸载），然后从 `render` 获取的新的部分应该被挂载，然后把挂载后获得的元素替换现有的。这个方法还会检测是否一个元素可以被部分更新。彻底替换元素的主要条件是当一个新的元素是空元素 (意即被 render 逻辑移除了)。或者它的标签不同，比如原先是一个 `div`，然而是现在是其它的标签了。让我们来看以下代码，表达的非常清晰。
 
 ```javascript
 ///src/renderers/shared/shared/shouldUpdateReactComponent.js#25
