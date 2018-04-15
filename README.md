@@ -1,4 +1,5 @@
 # ReactJS 底层揭秘
+
 本库包含 ReactJS 内部工作原理的说明。实际上，我在调试整个代码库时，将所有的逻辑放在可视化的流程图上，对它们进行分析，然后总结和解释主要的概念和方法。我已经完成了 Stack 版本，现在我在研究下一个版本 —— Fiber。
 
 > 通过 [github-pages 网站](https://bogdan-lyashenko.github.io/Under-the-hood-ReactJS/)来以最佳格式阅读.
