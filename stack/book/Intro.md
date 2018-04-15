@@ -107,4 +107,4 @@ ReactDOM.render(
 [下一页：Part 0 >>](./Part-0.md)
 
 
-[首页](./README.md)
+[首页](../../README.md)
